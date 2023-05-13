@@ -25,15 +25,11 @@ jobs:
           name: Deploy to EKS
           command: |
               curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-              curl -Lo aws-iam-authenticator https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.5.9/aws-iam-authenticator_0.5.9_linux_amd64
               chmod +x ./kubectl
-              chmod +x ./aws-iam-authenticator
-              mkdir -p $HOME/bin && cp ./aws-iam-authenticator $HOME/bin/aws-iam-authenticator && export PATH=$HOME/bin:$PATH
-              echo 'export PATH=$HOME/bin:$PATH' >> ~/.bashrc
               pip3 install awscli --upgrade
               aws --version
               aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 207100238581.dkr.ecr.us-east-2.amazonaws.com
-              aws eks update-kubeconfig --name my-cluster --region us-west-2
+              aws eks update-kubeconfig --name my-cluster
               LATEST_SHA=$(git rev-parse HEAD)
               docker build -t express-eks:$LATEST_SHA .
               docker tag express-eks:$LATEST_SHA 207100238581.dkr.ecr.us-east-2.amazonaws.com/express-eks:$LATEST_SHA
